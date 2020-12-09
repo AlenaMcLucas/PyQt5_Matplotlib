@@ -422,10 +422,10 @@ background-color:  rgb(239, 242, 255);
   <action name="actionSave_2">
    <property name="icon">
     <iconset>
-     <normaloff>save.JPG</normaloff>save.JPG</iconset>
+     <normaloff>icons/save.png</normaloff>icons/save.png</iconset>
    </property>
    <property name="text">
-    <string>Enregistrer</string>
+    <string>Save</string>
    </property>
   </action>
   <action name="actionSave_as">
