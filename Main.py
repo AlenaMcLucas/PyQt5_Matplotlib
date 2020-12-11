@@ -52,32 +52,13 @@ class Main(QMainWindow, FROM_MAIN):
 
         # Create second tab
         self.tables.layout = QVBoxLayout(self)
-
         self.tableWidget = QTableWidget()
-        self.tableWidget.setRowCount(4)
-        self.tableWidget.setColumnCount(2)
-        self.tableWidget.setItem(0, 0, QTableWidgetItem("Cell (1,1)"))
-        self.tableWidget.setItem(0, 1, QTableWidgetItem("Cell (1,2)"))
-        self.tableWidget.setItem(1, 0, QTableWidgetItem("Cell (2,1)"))
-        self.tableWidget.setItem(1, 1, QTableWidgetItem("Cell (2,2)"))
-        self.tableWidget.setItem(2, 0, QTableWidgetItem("Cell (3,1)"))
-        self.tableWidget.setItem(2, 1, QTableWidgetItem("Cell (3,2)"))
-        self.tableWidget.setItem(3, 0, QTableWidgetItem("Cell (4,1)"))
-        self.tableWidget.setItem(3, 1, QTableWidgetItem("Cell (4,2)"))
-        self.tableWidget.move(0, 0)
-
         self.tables.layout.addWidget(self.tableWidget)
         self.tables.setLayout(self.tables.layout)
-
-
 
         # Add tabs to widget
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
-
-        self.layout.addWidget(self.tabs)
-
-
 
         self.Qe = False
         self.quit_switch = False
@@ -115,8 +96,8 @@ class Main(QMainWindow, FROM_MAIN):
         self.toolbar.addAction(regression3D)
 
         # create two tabs
-        # self.tabWidget.addTab(self.tab, "Results")
-        # self.tabWidget.addTab(self.tab_2, "Info")
+        self.tabWidget.addTab(self.tab, "Results")
+        self.tabWidget.addTab(self.tab_2, "Info")
 
         # create menu bar, to revist
         self.actionSave_2.setShortcut('Ctrl+S')
@@ -173,6 +154,7 @@ class Main(QMainWindow, FROM_MAIN):
                 self.browse_folder()
 
     def browse_folder(self):
+        """Select a csv file."""
         global current_file
 
         if self.Qe:
@@ -182,6 +164,21 @@ class Main(QMainWindow, FROM_MAIN):
             if current_file:
                 self.listWidget.clear()
                 self.listWidget.addItem(current_file)
+
+    def create_table(self):
+        """Display table of the selected file's data."""
+        csv_test = FeatureStore('data/' + current_file.split('/data/')[1])
+        n, m = csv_test.df.shape
+
+        self.tableWidget.setRowCount(n)
+        self.tableWidget.setColumnCount(m)
+        self.tableWidget.setHorizontalHeaderLabels(csv_test.df.columns)
+
+        for n_range in range(n):
+            for m_range in range(m):
+                self.tableWidget.setItem(n_range, m_range, QTableWidgetItem(str(csv_test.df.iloc[n_range, m_range])))
+
+        self.tableWidget.move(0, 0)
 
     def Plot3D(self):
         n = ""
@@ -231,6 +228,7 @@ class Main(QMainWindow, FROM_MAIN):
                  QMessageBox.critical(self, 'Error', "   Error plot!")
 
     def Plot2D(self):
+        self.create_table()
         csv_test = FeatureStore('data/' + current_file.split('/data/')[1])
 
         n = ""
@@ -259,6 +257,7 @@ class Main(QMainWindow, FROM_MAIN):
                 QMessageBox.critical(self, 'Error', "   Error plot!")
 
     def Regression2d(self):
+        self.create_table()
         csv_test = FeatureStore('data/' + current_file.split('/data/')[1])
 
         n = ""
