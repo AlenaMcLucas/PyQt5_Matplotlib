@@ -14,8 +14,6 @@ from sklearn.linear_model import LinearRegression
 import numpy as np
 
 
-import Regression3D
-import Regression2D
 from feature_store import FeatureStore
 
 
@@ -71,12 +69,12 @@ class Main(QMainWindow, FROM_MAIN):
         scatter3D = QAction(QIcon('icons/cupe.PNG'), 'Scatter 3D', self)
         scatter3D.setShortcut('Ctrl+L')
         scatter3D.setEnabled(1)
-        scatter3D.triggered.connect(self.Plot3D)
+        scatter3D.triggered.connect(self.pass_placeholder)
 
         regression3D = QAction(QIcon('icons/cupe_plan.PNG'), 'Regression 3D', self)
         regression3D.setShortcut('Ctrl+r')
         regression3D.setEnabled(1)
-        regression3D.triggered.connect(self.Resression3d)
+        regression3D.triggered.connect(self.pass_placeholder)
 
         scatter2D = QAction(QIcon('icons/scatter-graph.png'), 'Scatter 2D', self)
         scatter2D.setShortcut('Ctrl+L')
@@ -115,6 +113,9 @@ class Main(QMainWindow, FROM_MAIN):
         self.actionHelp.setShortcut('Ctrl+H')
         self.actionHelp.setStatusTip('Help')
         self.actionHelp.triggered.connect(self.help)
+
+    def pass_placeholder(self):
+        pass
 
     def quit(self):
         self.quit_switch = True
@@ -180,53 +181,6 @@ class Main(QMainWindow, FROM_MAIN):
 
         self.tableWidget.move(0, 0)
 
-    def Plot3D(self):
-        n = ""
-        try:
-            n = Regression3D.getNe(current_file)
-            if n < 4:
-                QMessageBox.warning(self, 'Error', "Number of points < 4!")
-                return
-        except:
-            QMessageBox.critical(self, 'Error', "   No data file!")
-        if n != "":
-            a, b, c, xarray, yarray, zarray, za = Regression3D.Regresion3D(current_file)
-            self.label_7.setText('C')
-            self.lineEdit.setText(str(c))
-            self.lineEdit_2.setText(str(b))
-            self.lineEdit_3.setText(str(a))
-            self.reg.setText(" Z = Ax + By + C ")
-
-            self.Qe = True
-            try:
-                self.sc.plot1(xarray, yarray, zarray)
-            except:
-                QMessageBox.critical(self, 'Error', "   Error plot!")
-
-    def Resression3d(self):
-        n=""
-        try:
-            n = Regression3D.getNe(current_file)
-            if n < 4:
-                QMessageBox.warning(self, 'Error', "Number of points < 4!")
-                return
-        except:
-            QMessageBox.critical(self, 'Error', "   No data file!")
-
-        if  n != "":
-            a, b, c, xarray, yarray, zarray, za = Regression3D.Regresion3D(current_file)
-            self.label_7.setText('C')
-            self.lineEdit.setText(str(c))
-            self.lineEdit_2.setText(str(b))
-            self.lineEdit_3.setText(str(a))
-            self.reg.setText(" Z = Ax + By + C ")
-
-            self.Qe = True
-            try:
-                self.sc.plot2(xarray, yarray, zarray, za)
-            except:
-                 QMessageBox.critical(self, 'Error', "   Error plot!")
-
     def Plot2D(self):
         self.create_table()
         csv_test = FeatureStore('data/' + current_file.split('/data/')[1])
@@ -271,7 +225,6 @@ class Main(QMainWindow, FROM_MAIN):
             QMessageBox.critical(self, 'Error', "   No data file!")
 
         if n != "":
-            # a, b, xarray, zarray, za = Regression2D.Regression2d(current_file)
             X = csv_test.df['age'].to_numpy().reshape(-1, 1)
             y = csv_test.df['trestbps'].to_numpy()
             reg = LinearRegression().fit(X, y)
