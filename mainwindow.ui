@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Soft</string>
+   <string>Data Analysis Application</string>
   </property>
   <property name="autoFillBackground">
    <bool>true</bool>
@@ -61,6 +61,9 @@
      </widget>
     </item>
     <item row="0" column="0">
+
+        <!-- Lists loaded file -->
+
      <widget class="QListWidget" name="listWidget">
       <property name="enabled">
        <bool>true</bool>
@@ -92,6 +95,9 @@
      </widget>
     </item>
     <item row="3" column="0" colspan="5">
+
+        <!-- Results and Info tabs on the bottom -->
+
      <widget class="QTabWidget" name="tabWidget">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -124,6 +130,9 @@
       <property name="currentIndex">
        <number>1</number>
       </property>
+
+         <!-- First tab -->
+
       <widget class="QWidget" name="tab">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -132,7 +141,7 @@
         </sizepolicy>
        </property>
        <attribute name="title">
-        <string>Tab 1</string>
+        <string>Results</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="1">
@@ -305,6 +314,9 @@ background-color:  rgb(239, 242, 255);
         </item>
        </layout>
       </widget>
+
+         <!-- Second tab -->
+
       <widget class="QWidget" name="tab_2">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -313,7 +325,7 @@ background-color:  rgb(239, 242, 255);
         </sizepolicy>
        </property>
        <attribute name="title">
-        <string>Tab 2</string>
+        <string>Info</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3"/>
       </widget>

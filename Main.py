@@ -1,7 +1,8 @@
 
 import Regression3D
 import Regression2D
-from PyQt5.QtWidgets import (QApplication, QMessageBox, QMainWindow, QVBoxLayout, QAction, QFileDialog, QDialog)
+from PyQt5.QtWidgets import (QApplication, QMessageBox, QMainWindow, QVBoxLayout, QAction, QFileDialog, QDialog,
+                             QTabWidget, QWidget, QPushButton, QTableWidget, QTableWidgetItem)
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QIcon
 from PyQt5.uic import loadUiType
@@ -11,6 +12,10 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from mpl_toolkits.mplot3d import axis3d, axes3d
 import matplotlib.pyplot as plt
+
+
+from feature_store import FeatureStore
+
 
 scriptDir = dirname(realpath(__file__))
 FROM_MAIN, _ = loadUiType(join(dirname(__file__), "mainwindow.ui"))
@@ -24,12 +29,56 @@ class Main(QMainWindow, FROM_MAIN):
         QMainWindow.__init__(self)
         self.setupUi(self)
         self.listWidget.addItem("Add data file")
+
+        self.layout = QVBoxLayout(self.frame)
+
+        # Initialize tab screen
+        self.tabs = QTabWidget()
+        self.visualizations = QWidget()
+        self.tables = QWidget()
+        self.tabs.resize(300, 200)
+
+        # Add tabs
+        self.tabs.addTab(self.visualizations, "Visualizations")
+        self.tabs.addTab(self.tables, "Tables")
+
+        # Create first tab
+        self.visualizations.layout = QVBoxLayout(self)
         self.sc = MyCanvas()
-        self.l = QVBoxLayout(self.frame)
-        self.l.addWidget(self.sc)
+        self.visualizations.layout.addWidget(self.sc)
+        self.visualizations.setLayout(self.visualizations.layout)
+
+        # Create second tab
+        self.tables.layout = QVBoxLayout(self)
+
+        self.tableWidget = QTableWidget()
+        self.tableWidget.setRowCount(4)
+        self.tableWidget.setColumnCount(2)
+        self.tableWidget.setItem(0, 0, QTableWidgetItem("Cell (1,1)"))
+        self.tableWidget.setItem(0, 1, QTableWidgetItem("Cell (1,2)"))
+        self.tableWidget.setItem(1, 0, QTableWidgetItem("Cell (2,1)"))
+        self.tableWidget.setItem(1, 1, QTableWidgetItem("Cell (2,2)"))
+        self.tableWidget.setItem(2, 0, QTableWidgetItem("Cell (3,1)"))
+        self.tableWidget.setItem(2, 1, QTableWidgetItem("Cell (3,2)"))
+        self.tableWidget.setItem(3, 0, QTableWidgetItem("Cell (4,1)"))
+        self.tableWidget.setItem(3, 1, QTableWidgetItem("Cell (4,2)"))
+        self.tableWidget.move(0, 0)
+
+        self.tables.layout.addWidget(self.tableWidget)
+        self.tables.setLayout(self.tables.layout)
+
+
+
+        # Add tabs to widget
+        self.layout.addWidget(self.tabs)
+        self.setLayout(self.layout)
+
+        self.layout.addWidget(self.tabs)
+
+
+
         self.Qe = False
         self.quit_switch = False
-        # self.p = 0
 
         # create toolbar
         add_file = QAction(QIcon('icons/add-file.png'), 'Add Data File', self)
@@ -64,8 +113,8 @@ class Main(QMainWindow, FROM_MAIN):
         self.toolbar.addAction(regression3D)
 
         # create two tabs
-        self.tabWidget.addTab(self.tab, "Results")
-        self.tabWidget.addTab(self.tab_2, "Info")
+        # self.tabWidget.addTab(self.tab, "Results")
+        # self.tabWidget.addTab(self.tab_2, "Info")
 
         # create menu bar, to revist
         self.actionSave_2.setShortcut('Ctrl+S')
@@ -137,10 +186,10 @@ class Main(QMainWindow, FROM_MAIN):
         try:
             n = Regression3D.getNe(filename)
             if n < 4:
-                QMessageBox.warning(self, 'Error!', "Number  of points < 4 !")
+                QMessageBox.warning(self, 'Error', "Number of points < 4!")
                 return
         except:
-            QMessageBox.critical(self, 'Erorre', "   No data File !")
+            QMessageBox.critical(self, 'Error', "   No data file!")
         if n != "":
             a, b, c, xarray, yarray, zarray, za = Regression3D.Regresion3D(filename)
             self.label_7.setText('C')
@@ -153,17 +202,17 @@ class Main(QMainWindow, FROM_MAIN):
             try:
                 self.sc.plot1(xarray, yarray, zarray)
             except:
-                QMessageBox.critical(self, 'Erorre', "   Erore Plot")
+                QMessageBox.critical(self, 'Error', "   Error plot!")
 
     def Resression3d(self):
         n=""
         try:
             n = Regression3D.getNe(filename)
             if n < 4:
-                QMessageBox.warning(self, 'Error!', "Number  of points < 4 !")
+                QMessageBox.warning(self, 'Error', "Number of points < 4!")
                 return
         except:
-            QMessageBox.critical(self, 'Erorre', "   No data File !")
+            QMessageBox.critical(self, 'Error', "   No data file!")
 
         if  n != "":
             a, b, c, xarray, yarray, zarray, za = Regression3D.Regresion3D(filename)
@@ -177,7 +226,7 @@ class Main(QMainWindow, FROM_MAIN):
             try:
                 self.sc.plot2(xarray, yarray, zarray, za)
             except:
-                 QMessageBox.critical(self, 'Erorre', "   Erore Plot")
+                 QMessageBox.critical(self, 'Error', "   Error plot!")
 
     def Plot2D(self):
         n = ""
@@ -185,10 +234,10 @@ class Main(QMainWindow, FROM_MAIN):
             n = Regression2D.getNe(filename)
 
             if n < 4:
-                QMessageBox.warning(self, 'Error!', "Number  of points < 4 !")
+                QMessageBox.warning(self, 'Error', "Number of points < 4!")
                 return
         except:
-            QMessageBox.critical(self, 'Erorre', "   No data File !")
+            QMessageBox.critical(self, 'Error', "   No data file!")
 
         if n != "":
             a, b, xarray, zarray, za = Regression2D.Regression2d(filename)
@@ -201,9 +250,11 @@ class Main(QMainWindow, FROM_MAIN):
 
             self.Qe = True
             try:
-                self.sc.plot2D(xarray,  zarray)
+                # self.sc.plot2D(xarray,  zarray)
+                csv_test = FeatureStore('data/test-data.csv')
+                self.sc.plot2D(csv_test.df['age'].tolist(), csv_test.df['trestbps'].tolist())
             except:
-                QMessageBox.critical(self, 'Erorre', "   Erore Plot")
+                QMessageBox.critical(self, 'Error', "   Error plot!")
 
     def Regression2d(self):
         n = ""
@@ -211,10 +262,10 @@ class Main(QMainWindow, FROM_MAIN):
             n = Regression2D.getNe(filename)
 
             if n < 4:
-                QMessageBox.warning(self, 'Error!', "Number  of points < 4 !")
+                QMessageBox.warning(self, 'Error', "Number of points < 4!")
                 return
         except:
-            QMessageBox.critical(self, 'Erorre', "   No data File !")
+            QMessageBox.critical(self, 'Error', "   No data file!")
 
         if n != "":
             a, b, xarray, zarray, za = Regression2D.Regression2d(filename)
@@ -239,41 +290,41 @@ class MyCanvas(FigureCanvas):
 
     def plot2(self, xarray, yarray, zarray, za):
         self.fig.clear()
-        self.ax = self.fig.add_subplot(111, projection='3d')
-        self.ax.mouse_init(rotate_btn=1, zoom_btn=3)
-        self.ax.plot_trisurf(xarray, yarray, za, color='red', alpha=0.6, edgecolor='red', linewidth=0.1,
-                             antialiased=True, shade=1)
-        self.ax.plot(xarray, yarray, zarray, 'ok')
-        self.ax.set_xlabel('X ')
-        self.ax.set_ylabel('Y ')
-        self.ax.set_zlabel('Z ')
+        ax = self.fig.add_subplot(111, projection='3d')
+        ax.mouse_init(rotate_btn=1, zoom_btn=3)
+        ax.plot_trisurf(xarray, yarray, za, color='red', alpha=0.6, edgecolor='red', linewidth=0.1,
+                        antialiased=True, shade=1)
+        ax.plot(xarray, yarray, zarray, 'ok')
+        ax.set_xlabel('X ')
+        ax.set_ylabel('Y ')
+        ax.set_zlabel('Z ')
         self.draw()
 
     def plot1(self, xarray, yarray, zarray):
         self.fig.clear()
-        self.ax = self.fig.add_subplot(111, projection='3d')
-        self.ax.mouse_init(rotate_btn=1, zoom_btn=3)
-        self.ax.plot(xarray, yarray, zarray, 'ok')
-        self.ax.set_xlabel('X ')
-        self.ax.set_ylabel('Y ')
-        self.ax.set_zlabel('Z ')
+        ax = self.fig.add_subplot(111, projection='3d')
+        ax.mouse_init(rotate_btn=1, zoom_btn=3)
+        ax.plot(xarray, yarray, zarray, 'ok')
+        ax.set_xlabel('X ')
+        ax.set_ylabel('Y ')
+        ax.set_zlabel('Z ')
         self.draw()
 
     def plot2D(self, xarray, zarray):
         self.fig.clear()
-        self.axe = self.fig.add_subplot(111)
-        self.axe.plot(xarray, zarray, 'ok')
-        self.axe.set_xlabel('X ')
-        self.axe.set_ylabel('Y ')
+        axe = self.fig.add_subplot(111)
+        axe.plot(xarray, zarray, 'ok')
+        axe.set_xlabel('X ')
+        axe.set_ylabel('Y ')
         self.draw()
 
     def plot2DM(self, xarray, zarray, za):
         self.fig.clear()
-        self.axe = self.fig.add_subplot(111)
-        self.axe.plot(xarray, zarray, "ok")
-        self.axe.plot(xarray, za, 'r-')
-        self.axe.set_xlabel('X ')
-        self.axe.set_ylabel('Y ')
+        axe = self.fig.add_subplot(111)
+        axe.plot(xarray, zarray, "ok")
+        axe.plot(xarray, za, 'r-')
+        axe.set_xlabel('X ')
+        axe.set_ylabel('Y ')
         self.draw()
 
 
