@@ -1,6 +1,4 @@
 
-import Regression3D
-import Regression2D
 from PyQt5.QtWidgets import (QApplication, QMessageBox, QMainWindow, QVBoxLayout, QAction, QFileDialog, QDialog,
                              QTabWidget, QWidget, QPushButton, QTableWidget, QTableWidgetItem)
 from PyQt5.QtCore import *
@@ -12,8 +10,12 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from mpl_toolkits.mplot3d import axis3d, axes3d
 import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+import numpy as np
 
 
+import Regression3D
+import Regression2D
 from feature_store import FeatureStore
 
 
@@ -171,27 +173,27 @@ class Main(QMainWindow, FROM_MAIN):
                 self.browse_folder()
 
     def browse_folder(self):
-        global filename
+        global current_file
 
         if self.Qe:
             self.message_save()
         else:
-            filename, _ = QFileDialog.getOpenFileName(self, "Open", "", "Text Files (*.txt);;All Files (*)")
-            if filename:
+            current_file, _ = QFileDialog.getOpenFileName(self, "Open", "", "CSV files (*.csv)")
+            if current_file:
                 self.listWidget.clear()
-                self.listWidget.addItem(filename)
+                self.listWidget.addItem(current_file)
 
     def Plot3D(self):
         n = ""
         try:
-            n = Regression3D.getNe(filename)
+            n = Regression3D.getNe(current_file)
             if n < 4:
                 QMessageBox.warning(self, 'Error', "Number of points < 4!")
                 return
         except:
             QMessageBox.critical(self, 'Error', "   No data file!")
         if n != "":
-            a, b, c, xarray, yarray, zarray, za = Regression3D.Regresion3D(filename)
+            a, b, c, xarray, yarray, zarray, za = Regression3D.Regresion3D(current_file)
             self.label_7.setText('C')
             self.lineEdit.setText(str(c))
             self.lineEdit_2.setText(str(b))
@@ -207,7 +209,7 @@ class Main(QMainWindow, FROM_MAIN):
     def Resression3d(self):
         n=""
         try:
-            n = Regression3D.getNe(filename)
+            n = Regression3D.getNe(current_file)
             if n < 4:
                 QMessageBox.warning(self, 'Error', "Number of points < 4!")
                 return
@@ -215,7 +217,7 @@ class Main(QMainWindow, FROM_MAIN):
             QMessageBox.critical(self, 'Error', "   No data file!")
 
         if  n != "":
-            a, b, c, xarray, yarray, zarray, za = Regression3D.Regresion3D(filename)
+            a, b, c, xarray, yarray, zarray, za = Regression3D.Regresion3D(current_file)
             self.label_7.setText('C')
             self.lineEdit.setText(str(c))
             self.lineEdit_2.setText(str(b))
@@ -229,9 +231,11 @@ class Main(QMainWindow, FROM_MAIN):
                  QMessageBox.critical(self, 'Error', "   Error plot!")
 
     def Plot2D(self):
+        csv_test = FeatureStore('data/' + current_file.split('/data/')[1])
+
         n = ""
         try:
-            n = Regression2D.getNe(filename)
+            n = csv_test.df.shape[0]
 
             if n < 4:
                 QMessageBox.warning(self, 'Error', "Number of points < 4!")
@@ -240,7 +244,7 @@ class Main(QMainWindow, FROM_MAIN):
             QMessageBox.critical(self, 'Error', "   No data file!")
 
         if n != "":
-            a, b, xarray, zarray, za = Regression2D.Regression2d(filename)
+            a, b = 1, 2
 
             self.lineEdit.setText(str(a))
             self.lineEdit_2.setText(str(b))
@@ -250,16 +254,16 @@ class Main(QMainWindow, FROM_MAIN):
 
             self.Qe = True
             try:
-                # self.sc.plot2D(xarray,  zarray)
-                csv_test = FeatureStore('data/test-data.csv')
                 self.sc.plot2D(csv_test.df['age'].tolist(), csv_test.df['trestbps'].tolist())
             except:
                 QMessageBox.critical(self, 'Error', "   Error plot!")
 
     def Regression2d(self):
+        csv_test = FeatureStore('data/' + current_file.split('/data/')[1])
+
         n = ""
         try:
-            n = Regression2D.getNe(filename)
+            n = csv_test.df.shape[0]
 
             if n < 4:
                 QMessageBox.warning(self, 'Error', "Number of points < 4!")
@@ -268,7 +272,13 @@ class Main(QMainWindow, FROM_MAIN):
             QMessageBox.critical(self, 'Error', "   No data file!")
 
         if n != "":
-            a, b, xarray, zarray, za = Regression2D.Regression2d(filename)
+            # a, b, xarray, zarray, za = Regression2D.Regression2d(current_file)
+            X = csv_test.df['age'].to_numpy().reshape(-1, 1)
+            y = csv_test.df['trestbps'].to_numpy()
+            reg = LinearRegression().fit(X, y)
+            a, b = reg.coef_[0], reg.intercept_
+            y_pred = reg.predict(X)
+
             self.lineEdit.setText(str(a))
             self.lineEdit_2.setText(str(b))
             self.lineEdit_3.setText(' ')
@@ -277,9 +287,9 @@ class Main(QMainWindow, FROM_MAIN):
 
             self.Qe = True
             try:
-                self.sc.plot2DM(xarray, zarray,za)
+                self.sc.plot2DM(X, y, y_pred)
             except:
-                QMessageBox.critical(self, 'Erorre', "   Erore Plot")
+                QMessageBox.critical(self, 'Error', "   Error plot!!")
 
 
 class MyCanvas(FigureCanvas):
