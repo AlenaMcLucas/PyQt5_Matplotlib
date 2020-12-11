@@ -250,28 +250,6 @@ class MyCanvas(FigureCanvas):
         self.fig = Figure()
         FigureCanvas.__init__(self, self.fig)
 
-    def plot2(self, xarray, yarray, zarray, za):
-        self.fig.clear()
-        ax = self.fig.add_subplot(111, projection='3d')
-        ax.mouse_init(rotate_btn=1, zoom_btn=3)
-        ax.plot_trisurf(xarray, yarray, za, color='red', alpha=0.6, edgecolor='red', linewidth=0.1,
-                        antialiased=True, shade=1)
-        ax.plot(xarray, yarray, zarray, 'ok')
-        ax.set_xlabel('X ')
-        ax.set_ylabel('Y ')
-        ax.set_zlabel('Z ')
-        self.draw()
-
-    def plot1(self, xarray, yarray, zarray):
-        self.fig.clear()
-        ax = self.fig.add_subplot(111, projection='3d')
-        ax.mouse_init(rotate_btn=1, zoom_btn=3)
-        ax.plot(xarray, yarray, zarray, 'ok')
-        ax.set_xlabel('X ')
-        ax.set_ylabel('Y ')
-        ax.set_zlabel('Z ')
-        self.draw()
-
     def plot2D(self, xarray, zarray):
         self.fig.clear()
         axe = self.fig.add_subplot(111)
